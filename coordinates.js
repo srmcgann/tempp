@@ -2900,9 +2900,9 @@ const SyncNormals = (shape, averageNormals=true, flipNormals=false,
       shape.normals[idx*18+m*6+3] = shape.vertices[idx*9+m*3+0] + (nrm[3] - nrm[0]) * fn
       shape.normals[idx*18+m*6+4] = shape.vertices[idx*9+m*3+1] + (nrm[4] - nrm[1]) * fn
       shape.normals[idx*18+m*6+5] = shape.vertices[idx*9+m*3+2] + (nrm[5] - nrm[2]) * fn
-      shape.normalVecs[idx*9+m*3+0] = shape.normals[idx*18+m*6+3] - shape.normals[idx*18+m*6+0] * fn
-      shape.normalVecs[idx*9+m*3+1] = shape.normals[idx*18+m*6+4] - shape.normals[idx*18+m*6+1] * fn
-      shape.normalVecs[idx*9+m*3+2] = shape.normals[idx*18+m*6+5] - shape.normals[idx*18+m*6+2] * fn
+      shape.normalVecs[idx*9+m*3+0] = (nrm[3] - nrm[0]) * fn
+      shape.normalVecs[idx*9+m*3+1] = (nrm[4] - nrm[1]) * fn
+      shape.normalVecs[idx*9+m*3+2] = (nrm[5] - nrm[2]) * fn
     }
   })
   if(averageNormals){
