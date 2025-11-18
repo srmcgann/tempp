@@ -2173,7 +2173,7 @@ const LoadGeometry = async (renderer, geoOptions) => {
   }
   
   if(averageNormals && !syncNormals) {
-    AverageNormals(vertices, normals, shapeType, normalVecs, flipNormals)
+    AverageNormals(vertices, normals, shapeType, normalVecs)
   }
 
   if(shapeType == 'dynamic' || preComputeNormalAssocs) {
