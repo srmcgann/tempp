@@ -2604,7 +2604,7 @@ const LoadGeometry = async (renderer, geoOptions) => {
     await renderer.nullShader.ConnectGeometry(geometry)
   }
   
-  if(geometry.syncNormals) SyncNormals(geometry, averageNormals, flipNormals)
+  if(geometry.syncNormals) SyncNormals(geometry, averageNormals, !flipNormals)
 
   if(geometry.downloadShape && !isFromZip) DownloadCustomShape(geometry)
   if(geometry.downloadAsOBJ && !isFromZip) DownloadAsOBJ(geometry)
