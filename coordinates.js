@@ -2891,7 +2891,7 @@ const SyncNormals = (shape, averageNormals=true, flipNormals=false,
                 [X3, Y3, Z3]], autoFlip, cx, cy, cz)
     nrms.push(n)
   }
-  var fn = flipNormals ? 1 : -1
+  var fn = flipNormals ? -1 : 1
   nrms.map((nrm, idx) => {
     for(var m = 0; m<3; m++){
       shape.normals[idx*18+m*6+0] = shape.vertices[idx*9+m*3+0]
