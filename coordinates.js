@@ -2604,7 +2604,7 @@ const LoadGeometry = async (renderer, geoOptions) => {
     await renderer.nullShader.ConnectGeometry(geometry)
   }
   
-  if(geometry.syncNormals) SyncNormals(geometry, averageNormals, !flipNormals)
+  if(geometry.syncNormals) SyncNormals(geometry, averageNormals, flipNormals)
 
   if(geometry.downloadShape && !isFromZip) DownloadCustomShape(geometry)
   if(geometry.downloadAsOBJ && !isFromZip) DownloadAsOBJ(geometry)
@@ -2891,7 +2891,7 @@ const SyncNormals = (shape, averageNormals=true, flipNormals=false,
                 [X3, Y3, Z3]], autoFlip, cx, cy, cz)
     nrms.push(n)
   }
-  var fn = flipNormals ? -1 : 1
+  var fn = flipNormals ? 1 : -1
   nrms.map((nrm, idx) => {
     for(var m = 0; m<3; m++){
       shape.normals[idx*18+m*6+0] = shape.vertices[idx*9+m*3+0]
@@ -3477,8 +3477,9 @@ const BasicShader = async (renderer, options=[]) => {
                     //light.rgb += .05;
                     float refP1, refP2;
                     if(refOmitEquirectangular != 1.0){
+                      float pitch = cameraMode == 1.0 ? -camOri.y : camOri.y;
                       vec3 reflectionPos = R_rpy(nV, vec3(0.0,
-                                                      camOri.y, -camOri.z));
+                                                      pitch, -camOri.z));
                       float px = reflectionPos.x;
                       float py = reflectionPos.y;
                       float pz = reflectionPos.z;
@@ -4996,21 +4997,59 @@ const ProcessShapeArray = shape => {
           x = shape[l][i + k + 0] - tx * m
           y = shape[l][i + k + 1] - ty * m
           z = shape[l][i + k + 2] - tz * m
-          p = Math.atan2(y, z) + data[shpIdx].pitch
-          d = Math.hypot(y, z)
-          x = x
-          y = S(p) * d
-          z = C(p) * d
-          p = Math.atan2(x, y) + data[shpIdx].roll
-          d = Math.hypot(x, y)
-          x = S(p) * d
-          y = C(p) * d
-          z = z
-          p = Math.atan2(x, z) + data[shpIdx].yaw
-          d = Math.hypot(x, z)
-          x = S(p) * d
-          y = y
-          z = C(p) * d
+          switch(shape.rotationMode){
+            case 0:
+              p = Math.atan2(x, y) + data[shpIdx].roll
+              d = Math.hypot(x, y)
+              x = S(p) * d
+              y = C(p) * d
+              z = z
+              p = Math.atan2(x, z) + data[shpIdx].yaw
+              d = Math.hypot(x, z)
+              x = S(p) * d
+              y = y
+              z = C(p) * d
+              p = Math.atan2(y, z) + data[shpIdx].pitch
+              d = Math.hypot(y, z)
+              x = x
+              y = S(p) * d
+              z = C(p) * d
+            break
+            case 1:
+              p = Math.atan2(y, z) + data[shpIdx].pitch
+              d = Math.hypot(y, z)
+              x = x
+              y = S(p) * d
+              z = C(p) * d
+              p = Math.atan2(x, z) + data[shpIdx].yaw
+              d = Math.hypot(x, z)
+              x = S(p) * d
+              y = y
+              z = C(p) * d
+              p = Math.atan2(x, y) + data[shpIdx].roll
+              d = Math.hypot(x, y)
+              x = S(p) * d
+              y = C(p) * d
+              z = z
+            break
+            case 2: case 3:
+              p = Math.atan2(x, y) + data[shpIdx].roll
+              d = Math.hypot(x, y)
+              x = S(p) * d
+              y = C(p) * d
+              z = z
+              p = Math.atan2(y, z) + data[shpIdx].pitch
+              d = Math.hypot(y, z)
+              x = x
+              y = S(p) * d
+              z = C(p) * d
+              p = Math.atan2(x, z) + data[shpIdx].yaw
+              d = Math.hypot(x, z)
+              x = S(p) * d
+              y = y
+              z = C(p) * d
+            break
+          }
           var l = m ? 'vertices' : 'normalVecs'
           shape[l][i + k + 0] = x + (tx + data[shpIdx].x) * m
           shape[l][i + k + 1] = y + (ty + data[shpIdx].y) * m
@@ -5019,21 +5058,59 @@ const ProcessShapeArray = shape => {
             x = shape.nstate[(i + k) * 2 + 0 + m * 3] - tx
             y = shape.nstate[(i + k) * 2 + 1 + m * 3] - ty
             z = shape.nstate[(i + k) * 2 + 2 + m * 3] - tz
-            p = Math.atan2(y, z) + data[shpIdx].pitch
-            d = Math.hypot(y, z)
-            x = x
-            y = S(p) * d
-            z = C(p) * d
-            p = Math.atan2(x, z) + data[shpIdx].yaw
-            d = Math.hypot(x, z)
-            x = S(p) * d
-            y = y
-            z = C(p) * d
-            p = Math.atan2(x, y) + data[shpIdx].roll
-            d = Math.hypot(x, y)
-            x = S(p) * d
-            y = C(p) * d
-            z = z
+            switch(shape.rotationMode){
+              case 0:
+                p = Math.atan2(x, y) + data[shpIdx].roll
+                d = Math.hypot(x, y)
+                x = S(p) * d
+                y = C(p) * d
+                z = z
+                p = Math.atan2(x, z) + data[shpIdx].yaw
+                d = Math.hypot(x, z)
+                x = S(p) * d
+                y = y
+                z = C(p) * d
+                p = Math.atan2(y, z) + data[shpIdx].pitch
+                d = Math.hypot(y, z)
+                x = x
+                y = S(p) * d
+                z = C(p) * d
+              break
+              case 1:
+                p = Math.atan2(y, z) + data[shpIdx].pitch
+                d = Math.hypot(y, z)
+                x = x
+                y = S(p) * d
+                z = C(p) * d
+                p = Math.atan2(x, z) + data[shpIdx].yaw
+                d = Math.hypot(x, z)
+                x = S(p) * d
+                y = y
+                z = C(p) * d
+                p = Math.atan2(x, y) + data[shpIdx].roll
+                d = Math.hypot(x, y)
+                x = S(p) * d
+                y = C(p) * d
+                z = z
+              break
+              case 2: case 3:
+                p = Math.atan2(x, y) + data[shpIdx].roll
+                d = Math.hypot(x, y)
+                x = S(p) * d
+                y = C(p) * d
+                z = z
+                p = Math.atan2(y, z) + data[shpIdx].pitch
+                d = Math.hypot(y, z)
+                x = x
+                y = S(p) * d
+                z = C(p) * d
+                p = Math.atan2(x, z) + data[shpIdx].yaw
+                d = Math.hypot(x, z)
+                x = S(p) * d
+                y = y
+                z = C(p) * d
+              break
+            }
             shape.normals[(i + k) * 2 + 0 + m * 3] = x + tx
             shape.normals[(i + k) * 2 + 1 + m * 3] = y + ty
             shape.normals[(i + k) * 2 + 2 + m * 3] = z + tz
